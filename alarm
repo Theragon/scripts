@@ -1,0 +1,87 @@
+#!/bin/bash
+
+fulltime=$1
+
+current_epoch=$(date +%s)
+seconds=${fulltime:6}
+minutes=${fulltime:3:2}
+hours=${fulltime:0:2}
+#days=${fulltime:0:2}
+
+let "minutes2 = 10#$minutes * 60"
+let "hours2 = $hours * 60 * 60"
+#let "days = $days * 24 * 60 * 60"
+let "sleeptime = $seconds+$minutes2+$hours2"
+
+echo "sleeptime: $sleeptime"
+
+let "total=$current_epoch+$sleeptime"
+target_epoch=$(date -d @$total)
+echo "I will alarm you on $(date -d @$total)"
+#echo "sleeptime: $sleeptime seconds"
+
+count=$sleeptime
+
+
+function getTime(){
+	if [[ $count -ge 3600 ]];
+		then
+			let "hours1=$((count/3600))"
+			let "count2=$((count-(hours1*3600)))"
+			let "minutes1=$((count2/60))"
+			let "count2=$((count2-(minutes1*60)))"
+			let "seconds1=$count2"
+
+		else
+			let "hours1=0"
+			let "minutes1=$((count/60))"
+			let "seconds1=$((count-(minutes1*60)))"
+	fi
+
+	if [[ $hours1 -lt 10 ]];
+		then
+			echo -ne "0$hours1:"
+		else
+			echo -ne "$hours1:"
+	fi
+	if [[ $minutes1 -lt 10 ]];
+		then
+			echo -ne "0$minutes1:"
+		else
+			echo -ne "$minutes1:"
+	fi
+	if [[ $seconds1 -lt 10 ]];
+		then
+			echo -ne "0$seconds1"
+		else
+			echo -ne "$seconds1"
+	fi
+}
+
+if [[ "$sleeptime" -gt 0 ]];
+	then
+		while :
+		do
+			if [[ "$count" -le 0 ]];
+				then
+					break
+			fi
+
+			getTime
+			sleep 1
+			echo -ne "       \r"
+			(( count-- ))
+			(( total-- ))
+		done
+fi
+
+pactl set-sink-mute 0 false
+pactl set-sink-volume 0 -- 50%
+echo "TIME IS UP!"
+echo "Increasing volume to 50%!!!"
+vlc -L ~/Music/ALARM1.mp3 &
+wait
+#pid=$!
+#sleep 1
+#kill $PID
+exit 2
