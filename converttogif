@@ -1,0 +1,42 @@
+#!/bin/bash
+
+src=$1
+dst=$2
+
+echo "I will convert $src to a gif named $dst"
+sleep 2
+
+mplayer -ao null $src -vo jpeg:outdir=mypics
+wait
+echo "Done creating jpeg images"
+echo "Please wait while i convert images to gif"
+echo "This might take some time, depending on the size and quality of the original video file"
+
+convert -verbose ~/mypics/*.jpg ~/mypics/$dst.gif
+wait
+echo "Done converting images to $dst.gif"
+echo "Removing jpeg files"
+
+rm ~/mypics/*.jpg
+wait
+echo "All done images have been removed and your gif is ready"
+
+#For optimization, maybe implement later
+while true; do
+    read -p "Do you wish to optimize the gif file?" yn
+    case $yn in
+        [Yy]* ) convert ~/mypics/$dst.gif -fuzz 15% -layers Optimize ~/mypics/$dst-optimized.gif; break;;
+        [Nn]* ) return;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+
+echo "Do you wish to delete the original video file?"
+select yn in "Yes" "No"; do
+    case $yn in
+        Yes ) rm $src; break;;
+        No ) exit;;
+    esac
+done
+
+exit 2

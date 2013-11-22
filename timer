@@ -1,0 +1,81 @@
+#!/bin/bash
+
+seconds=0
+minutes=0
+hours=0
+
+on_die()
+{
+	echo -ne "       \r"
+	echo -ne "Total time: "
+
+	if [[ $hours -lt 10 ]];
+		then
+			echo -ne "0$hours:"
+		else
+			echo -ne "$hours:"
+	fi
+	if [[ $minutes -lt 10 ]];
+		then
+			echo -ne "0$minutes:"
+		else
+			echo -ne "$minutes:"
+	fi
+	if [[ $seconds -lt 10 ]];
+		then
+			echo -ne "0$seconds"
+		else
+			echo -ne "$seconds"
+	fi
+
+	printf "\n"
+	# Need to exit the script explicitly when done.
+	# Otherwise the script would live on, until system
+	# really goes down, and KILL signals are sent.
+	exit 0
+}
+
+trap 'on_die' INT
+
+function display(){
+	if [[ $hours -lt 10 ]];
+		then
+			echo -ne "0$hours:"
+		else
+			echo -ne "$hours:"
+	fi
+	if [[ $minutes -lt 10 ]];
+		then
+			echo -ne "0$minutes:"
+		else
+			echo -ne "$minutes:"
+	fi
+	if [[ $seconds -lt 10 ]];
+		then
+			echo -ne "0$seconds"
+		else
+			echo -ne "$seconds"
+	fi
+}
+
+function calulateTime(){
+	if [[ $seconds -ge 60 ]];
+		then
+			(( minutes++ ))
+			let "seconds=0"
+	fi
+	if [[ $minutes -ge 60 ]];
+		then
+			(( hours++ ))
+			let "minutes=0"
+	fi
+}
+
+while :
+		do
+			calulateTime
+			display
+			sleep 1
+			echo -ne "       \r"
+			(( seconds++ ))
+		done
