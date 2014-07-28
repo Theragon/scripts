@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+#ffmpeg -ss 1:23 -i frozen_trailer.mp4 -t 0.5 out.gif
+import sys
+import subprocess
+
+def main():
+	video = sys.argv[1]
+	time = sys.argv[2]
+	duration = sys.argv[3]
+	gif = sys.argv[4]
+
+	print('time: ' + time)
+	print('video:' + video)
+	print('duration: ' + duration)
+	print('gif: ' + gif)
+
+	#out = check_output(['ffmepg', '-ss', time, '-i', video, '-t', time, gif])
+	p = subprocess.call('ffmpeg -ss ' + time + ' -i ' + video + ' -t ' + time + ' ' + gif, shell=True)
+
+	#print(out)
+
+if __name__ == '__main__':
+	main()
