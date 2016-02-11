@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+if [ $# -eq 0 ]; then
+	path=$(pwd)
+else
+	path=$1
+fi
+echo "$path"
+twistd -no web --path=$path --port=8000
